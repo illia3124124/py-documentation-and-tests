@@ -76,7 +76,7 @@ class UnauthenticatedMovieApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
-class MovieViewTest(TestCase):
+class AuthenticatedMovieApiTests(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = get_user_model().objects.create_user(
@@ -84,55 +84,63 @@ class MovieViewTest(TestCase):
             "testpassword123"
         )
         self.client.force_authenticate(self.user)
-
-    def test_movie_list(self) -> None:
-        sample_movie()
-        genre_1 = sample_genre()
-        genre_2 = sample_genre(
+        self.genre_1 = sample_genre()
+        self.genre_2 = sample_genre(
             name="Horror",
         )
-        movies_with_additional_data = sample_movie()
-        movies_with_additional_data.actors.add(sample_actor())
-        movies_with_additional_data.genres.add(
-            sample_genre(
-                name="Horror"
-            )
+        self.genre_3 = sample_genre(
+            name="Comedy",
         )
-        movies_with_additional_data_2 = sample_movie()
-        movies_with_additional_data_2.actors.add(
-            sample_actor(
-                first_name="George",
-                last_name="Clooney"
-            ),
-            sample_actor(
-                first_name="Test",
-                last_name="Test"
-            )
+        self.actor_1 = sample_actor()
+        self.actor_2 = sample_actor(
+            first_name="George",
+            last_name="Clooney"
         )
-        movies_with_additional_data_2.genres.add(
-            sample_genre(),
-            sample_genre(
-                name="Clooney"
-            )
+        self.actor_3 = sample_actor(
+            first_name="Test",
+            last_name="Test"
         )
+        self.movie = sample_movie()
+        self.movies_with_additional_data = sample_movie()
+        self.movies_with_additional_data.actors.add(self.actor_1)
+        self.movies_with_additional_data.genres.add(self.genre_1)
+        self.movies_with_additional_data_2 = sample_movie()
+        self.movies_with_additional_data_2.actors.add(
+            self.actor_2,
+            self.actor_3
+        )
+        self.movies_with_additional_data_2.genres.add(
+            self.genre_2,
+            self.genre_3
+        )
+
+
+    def test_movie_list(self) -> None:
         res = self.client.get(MOVIE_URL)
         movies = Movie.objects.all()
         serializer = MovieListSerializer(movies, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(serializer.data, res.data)
 
-    def test_movie_detail(self):
+    def test_filter_movies_by_genres(self):
         res = self.client.get(
             MOVIE_URL,
             {
-                "genres": "2,3",
-                "actors": "3"
+                "genres": f"{self.genre_2.id},{self.genre_3.id}",
+                "actors": f"{self.actor_2.id},{self.actor_3.id}",
             }
         )
-        movies = Movie.objects.all()
-        serializer = MovieListSerializer(movies, many=True)
+        serializer_movie_with_additional_data = MovieListSerializer(
+            self.movies_with_additional_data_2
+        )
+        serializer_movie = MovieListSerializer(
+            self.movie
+        )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.
+        self.assertIn(serializer_movie_with_additional_data.data, res.data)
+        self.assertNotIn(serializer_movie.data, res.data)
+
+
 
 class MovieImageUploadTests(TestCase):
     def setUp(self):
