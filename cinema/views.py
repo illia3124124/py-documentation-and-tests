@@ -91,7 +91,7 @@ class MovieViewSet(
             OpenApiParameter(
                 "actors",
                 type=str,
-                description="Filter by actor id (e.g. ?genres=1,2)",
+                description="Filter by actor id (e.g. ?actors=1,2)",
                 required=False,
             )
         ]
@@ -182,7 +182,7 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
             OpenApiParameter(
                 "movie",
                 type=str,
-                description="Filter by movie title (e.g. ?movie=MovieTitle)",
+                description="Filter by movie id (e.g. ?movie=1)",
                 required=False,
             )
         ]
