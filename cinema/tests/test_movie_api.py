@@ -136,6 +136,7 @@ class AuthenticatedMovieApiTests(TestCase):
         res = self.client.get(
             MOVIE_URL,
             {
+                "title": "Sample movie",
                 "genres": f"{self.genre_2.id},{self.genre_3.id}",
                 "actors": f"{self.actor_2.id},{self.actor_3.id}",
             }

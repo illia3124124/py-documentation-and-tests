@@ -3,17 +3,21 @@ from datetime import datetime
 from django.db.models import F, Count
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import viewsets, mixins, status
-from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
-from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.viewsets import GenericViewSet
 
-from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
+from cinema.models import (
+    Genre,
+    Actor,
+    CinemaHall,
+    Movie,
+    MovieSession,
+    Order
+)
 from cinema.permissions import IsAdminOrIfAuthenticatedReadOnly
-
 from cinema.serializers import (
     GenreSerializer,
     ActorSerializer,
@@ -75,19 +79,19 @@ class MovieViewSet(
             OpenApiParameter(
                 "title",
                 type=str,
-                description="The title of the movie",
+                description="Filter by movie title",
                 required=False,
             ),
             OpenApiParameter(
                 "genres",
                 type=str,
-                description="The genres that the movie belongs to",
+                description="Filter by genre id (e.g. ?genres=1,2)",
                 required=False,
             ),
             OpenApiParameter(
                 "actors",
                 type=str,
-                description="The actors that the movie belongs to",
+                description="Filter by actor id (e.g. ?genres=1,2)",
                 required=False,
             )
         ]
@@ -172,13 +176,13 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
             OpenApiParameter(
                 "date",
                 type=str,
-                description="Date of the movie session",
+                description="Filter by movie creation date (e.g. ?date=2022-02-03)",
                 required=False,
             ),
             OpenApiParameter(
                 "movie",
                 type=str,
-                description="The title of the movie",
+                description="Filter by movie title (e.g. ?movie=MovieTitle)",
                 required=False,
             )
         ]
